@@ -7,6 +7,7 @@
 import argparse
 import glob
 import os
+import request
 import shutil
 import subprocess
 
@@ -29,6 +30,7 @@ def build_docker_image(framework_version, python_version, processor, binary_path
     base_docker_path = os.path.join(main_directory_path, 'docker', framework_version, 'base')
     final_docker_path = os.path.join(main_directory_path, 'docker', framework_version, 'final', py_v)
 
+
     # Get binary file - can pass either a local file path or a web url
     if framework_version not in ['1.4.1', '1.5.0']:
         print('Getting binary...')
@@ -37,8 +39,9 @@ def build_docker_image(framework_version, python_version, processor, binary_path
             shutil.copyfile(binary_path, os.path.join(final_docker_path, binary_filename))
         else:
             binary_filename = binary_path.split('/')[-1]
+            binary_response = request.get(binary_path)
             with open(os.path.join(final_docker_path, binary_filename), 'wb') as binary_file:
-                subprocess.call(['curl', binary_path], stdout=binary_file)
+                binary_file.write(binary_response.content)
 
     # Build base image
     print('Building base image...')
@@ -53,7 +56,7 @@ def build_docker_image(framework_version, python_version, processor, binary_path
     subprocess.call(['git', 'clone', 'https://github.com/aws/sagemaker-tensorflow-extensions.git'], cwd=final_docker_path)
 
     subprocess.call(['python', 'setup.py', 'sdist'], cwd=main_directory_path)
-    tar_file = glob.glob(os.path.join(main_directory_path, 'dist/sagemaker_tensorflow_container-*.tar.gz'))[0]
+    tar_file = glob.glob(os.path.join(main_directory_path, 'dist', 'sagemaker_tensorflow_container-*.tar.gz'))[0]
     tar_filename = os.path.basename(tar_file)
     shutil.copyfile(tar_file, os.path.join(final_docker_path, tar_filename))
 
@@ -83,7 +86,7 @@ def main():
 
     # Arguments used in build functions
     docker = 'nvidia-docker' if args.nvidia_docker else 'docker'
-    main_directory_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../..')
+    main_directory_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..')
     if args.final_image_tags:
         final_image_tags = args.final_image_tags
     else:
