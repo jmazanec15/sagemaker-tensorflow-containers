@@ -52,7 +52,8 @@ def build_docker_image(framework_version, python_version, processor, binary_path
     print('Building final image...')
 
     # Temporary fix until sagemaker-tensorflow-extensions is on PyPI
-    subprocess.call(['git', 'clone', 'https://github.com/aws/sagemaker-tensorflow-extensions.git'], cwd=final_docker_path)
+    subprocess.call(['git', 'clone', 'https://github.com/aws/sagemaker-tensorflow-extensions.git'],
+                    cwd=final_docker_path)
 
     subprocess.call(['python', 'setup.py', 'sdist'], cwd=main_directory_path)
     tar_file = glob.glob(os.path.join(main_directory_path, 'dist', 'sagemaker_tensorflow_container-*.tar.gz'))[0]
