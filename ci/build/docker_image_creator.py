@@ -30,7 +30,6 @@ def build_docker_image(framework_version, python_version, processor, binary_path
     base_docker_path = os.path.join(main_directory_path, 'docker', framework_version, 'base')
     final_docker_path = os.path.join(main_directory_path, 'docker', framework_version, 'final', py_v)
 
-
     # Get binary file - can pass either a local file path or a web url
     if framework_version not in ['1.4.1', '1.5.0']:
         print('Getting binary...')
