@@ -7,7 +7,7 @@
 import argparse
 import glob
 import os
-import request
+import requests
 import shutil
 import subprocess
 
@@ -39,7 +39,7 @@ def build_docker_image(framework_version, python_version, processor, binary_path
             shutil.copyfile(binary_path, os.path.join(final_docker_path, binary_filename))
         else:
             binary_filename = binary_path.split('/')[-1]
-            binary_response = request.get(binary_path)
+            binary_response = requests.get(binary_path)
             with open(os.path.join(final_docker_path, binary_filename), 'wb') as binary_file:
                 binary_file.write(binary_response.content)
 
